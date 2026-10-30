@@ -63,7 +63,7 @@ languages: codes from ["en","hi"]. useCase: one of appointments, lead_generation
 // Coach: one spoken sentence becomes a rule on the card and a permanent test.
 export async function coachToRule(card: JobCard, failed: { name: string; must: string; userLine: string; badReply: string }, correction: string) {
   return json<{ field: "ifUnsure" | "never" | "handoff" | "booking" | "extraRule"; newText: string; ruleSummary: string; testCondition: string }>(
-    `You help a clinic owner fix their AI receptionist. They describe in plain words what the receptionist should have done.
+    `You help a small-business owner fix their AI receptionist. They describe in plain words what the receptionist should have done.
 Turn it into ONE clear rule for the job card. Pick the field it belongs to:
 - ifUnsure: what to do when the receptionist doesn't know something (unknown prices etc.)
 - never: things it must never do
@@ -104,9 +104,9 @@ Fields: clinicName, business, hours, mainJobs, approvedPrices[{item,price}], boo
 // Observe: summary, sentiment and outcome for each call.
 export async function summarizeCall(transcript: { role: string; message: string }[], toolsUsed: string[]) {
   return json<{ summary: string; sentiment: "positive" | "neutral" | "negative"; outcome: "booked" | "callback" | "needs_you" | "answered" | "unresolved"; flag: string }>(
-    `Summarise a clinic receptionist call for the owner in one sentence (what the caller wanted and what happened).
+    `Summarise a business receptionist call for the owner in one sentence (what the caller wanted and what happened).
 outcome: booked (a booking tool succeeded), callback (callback logged, not urgent), needs_you (urgent or the owner must act), answered (question answered), unresolved.
-flag: empty string, or a short reason if the owner should look at it (pain, complaint, the agent made a promise it shouldn't).`,
+flag: empty string, or a short reason if the owner should look at it (an emergency, a complaint, or the receptionist promised something it shouldn't).`,
     JSON.stringify({ transcript, toolsUsed }),
     { type: Type.OBJECT, properties: { summary: { type: S }, sentiment: { type: S, enum: ["positive", "neutral", "negative"] },
       outcome: { type: S, enum: ["booked", "callback", "needs_you", "answered", "unresolved"] }, flag: { type: S } }, required: ["summary", "sentiment", "outcome", "flag"] },

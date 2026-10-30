@@ -1,25 +1,26 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api, type VersionJ, type Workspace } from "@/lib/client";
+import { useT } from "@/lib/i18n";
+import * as I from "@/components/Icons";
 import { VersionTabs } from "./TrialDay";
 
 export default function GoLive({ id, data, version, setVersionId, reload, onTrial }: {
   id: string; data: Workspace; version: VersionJ | null; setVersionId: (id: string) => void; reload: () => Promise<unknown>; onTrial: () => void;
 }) {
+  const t = useT();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
-  if (!version) return <div className="card p-8 text-ink-2">Create the receptionist first.</div>;
+  if (!version) return null;
 
   const run = data.runs.find((r) => r.versionId === version._id);
   const ready = run?.status === "done" && run.gate;
   const live = data.versions.find((v) => v.status === "live");
-  const agentId = data.clinic.agentId;
-  const snippet = `<elevenlabs-convai agent-id="${agentId}"></elevenlabs-convai>\n<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>`;
-  const talk = `${origin}/talk/${id}`;
-
+  const snippet = `<elevenlabs-convai agent-id="${data.clinic.agentId}"></elevenlabs-convai>\n<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>`;
+  const link = `${origin}/talk/${id}`;
   async function go() {
     setBusy(true); setErr("");
     try { await api(`/api/versions/${version!._id}/golive`, { method: "POST" }); await reload(); }
@@ -27,48 +28,54 @@ export default function GoLive({ id, data, version, setVersionId, reload, onTria
     finally { setBusy(false); }
   }
   const copy = (k: string, v: string) => navigator.clipboard.writeText(v).then(() => { setCopied(k); setTimeout(() => setCopied(""), 1500); });
+  const Item = ({ ok, children }: { ok: boolean; children: React.ReactNode }) => (
+    <li className="flex items-start gap-2">{ok ? <I.Check className="w-5 h-5 text-pass shrink-0" /> : <I.X className="w-5 h-5 text-fail shrink-0" />}<span>{children}</span></li>
+  );
 
   return (
     <div>
-      <h1 className="text-[28px] font-semibold">{live ? "Your receptionist is live" : "Go live"}</h1>
-      <p className="text-ink-2 mt-1">{live ? "Patients talk to the tested version only. Every call is listed under Calls with what actually happened." : "Only a version that passed every blocker test 3 of 3 can answer patients."}</p>
-      <div className="mt-4"><VersionTabs versions={data.versions} value={version._id} onChange={setVersionId} /></div>
+      <h1 className="font-display text-[30px] sm:text-[36px] leading-tight">{live ? t("glLiveTitle") : t("glTitle")}</h1>
+      <p className="text-ink-2 mt-2">{live ? t("glLiveSub") : t("glSub")}</p>
+      <div className="mt-5"><VersionTabs versions={data.versions} value={version._id} onChange={setVersionId} /></div>
 
-      <div className="mt-4 grid lg:grid-cols-2 gap-4">
-        <div className={`card p-5 ${ready ? "border-pass" : ""}`}>
-          <h3 className="font-semibold">Version {version.number}</h3>
-          <p className="text-[14px] text-ink-2 mt-1">{version.reason}</p>
-          <ul className="mt-3 space-y-1.5 text-[14px]">
-            <li>{run ? (run.status === "running" ? "⏳ Tests are running" : `${run.passed}/${run.total} test runs passed`) : "✕ Tests have not been run on this version"}</li>
-            <li>{ready ? "✓ Every blocker passed 3 of 3" : "✕ Not every blocker has passed 3 of 3"}</li>
-            <li>✓ Callers are told they are speaking with an AI</li>
-            <li>✓ Bookings count only with a calendar booking ID</li>
+      <div className="mt-5 grid lg:grid-cols-2 gap-4">
+        <div className={`card p-6 ${ready ? "border-pass" : ""}`}>
+          <h3 className="font-semibold text-[17px]">{t("version", { n: version.number })}</h3>
+          <ul className="mt-4 space-y-2.5 text-[15px]">
+            <Item ok={!!run && run.status === "done"}>{!run ? t("glPractisedNot") : run.status === "running" ? t("glPractising") : t("glRuns", { p: run.passed, t: run.total })}</Item>
+            <Item ok={!!ready}>{ready ? t("glGate") : t("glGateNo")}</Item>
+            <Item ok>{t("glAi")}</Item>
+            <Item ok>{t("glBookings")}</Item>
           </ul>
           {err && <p className="text-fail text-[14px] mt-3" role="alert">{err}</p>}
-          <div className="mt-4 flex gap-2">
-            {version.status === "live" ? <span className="badge-pass h-10 px-4 text-[14px]">● Version {version.number} is live</span>
-              : ready ? <button className="btn btn-primary btn-lg" disabled={busy} onClick={go}>{busy ? "Going live…" : `Put version ${version.number} live`}</button>
-              : <button className="btn btn-lg" onClick={onTrial}>Go to Trial Day</button>}
+          <div className="mt-6">
+            {version.status === "live" ? <span className="badge-pass h-11 px-4 text-[15px]"><I.Check className="w-4 h-4" /> {t("glIsLive", { n: version.number })}</span>
+              : ready ? <button className="btn btn-primary btn-lg" disabled={busy} onClick={go}>{busy ? t("glGoing") : t("glButton", { n: version.number })}</button>
+              : <button className="btn btn-lg" onClick={onTrial}>{t("glToPractice")}</button>}
           </div>
         </div>
 
-        <div className="card p-5">
-          <h3 className="font-semibold">Where patients reach it</h3>
-          {!live ? <p className="text-[14px] text-ink-3 mt-2">Available once a version is live.</p> : (
-            <div className="space-y-4 mt-3">
+        <div className="card p-6">
+          <h3 className="font-semibold text-[17px]">{t("glWhere")}</h3>
+          {!live ? <p className="text-[14.5px] text-ink-3 mt-2">{t("glWhereNo")}</p> : (
+            <div className="space-y-5 mt-4">
               <div>
-                <p className="text-[14px] font-medium">Share link</p>
-                <div className="mt-1 flex gap-2"><input readOnly className="field font-mono text-[13px]" value={talk} /><button className="btn" onClick={() => copy("link", talk)}>{copied === "link" ? "Copied" : "Copy"}</button><a className="btn btn-primary" href={talk} target="_blank">Open</a></div>
+                <p className="text-[15px] font-medium">{t("glLink")}</p>
+                <div className="mt-1.5 flex gap-2">
+                  <input readOnly className="field text-[14px]" value={link} aria-label={t("glLink")} />
+                  <button className="btn" onClick={() => copy("link", link)}>{copied === "link" ? t("glCopied") : t("glCopy")}</button>
+                  <a className="btn btn-primary" href={link} target="_blank">{t("glOpen")}</a>
+                </div>
               </div>
               <div>
-                <p className="text-[14px] font-medium">Add it to your website</p>
-                <p className="text-[13px] text-ink-2">Paste this before the closing body tag. The widget always uses the live version.</p>
-                <pre className="mt-1 rounded-[10px] bg-sunk p-3 text-[12px] font-mono whitespace-pre-wrap break-all">{snippet}</pre>
-                <button className="btn mt-2" onClick={() => copy("code", snippet)}>{copied === "code" ? "Copied" : "Copy code"}</button>
+                <p className="text-[15px] font-medium">{t("glWebsite")}</p>
+                <p className="text-[13.5px] text-ink-2">{t("glWebsiteSub")}</p>
+                <pre className="mt-2 rounded-[12px] bg-sunk p-3 text-[12px] font-mono whitespace-pre-wrap break-all">{snippet}</pre>
+                <button className="btn mt-2" onClick={() => copy("code", snippet)}>{copied === "code" ? t("glCopied") : t("glCopyCode")}</button>
               </div>
-              <div className="rounded-[10px] border border-dashed border-line-2 p-3">
-                <p className="text-[14px] font-medium">Phone number <span className="badge-muted ml-1">Not connected</span></p>
-                <p className="text-[13px] text-ink-2 mt-1">Connect a Twilio or SIP number to agent <span className="font-mono">{agentId}</span> in ElevenLabs (Agents → Phone numbers). It answers with the same live version. We add it only after a real call has been routed and tested end to end.</p>
+              <div className="rounded-[12px] border border-dashed border-line-2 p-4">
+                <p className="text-[15px] font-medium flex items-center gap-2"><I.Phone className="w-4 h-4" /> {t("glPhone")} <span className="badge-muted">{t("glPhoneSoon")}</span></p>
+                <p className="text-[13.5px] text-ink-2 mt-1">{t("glPhoneSub")}</p>
               </div>
             </div>
           )}

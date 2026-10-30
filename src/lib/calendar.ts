@@ -3,11 +3,11 @@ import { randomBytes } from "node:crypto";
 import type { ObjectId } from "mongodb";
 import { cols } from "./db";
 
-// Built-in clinic calendar. Times are India local (UTC+5:30); a booking exists only with a bk_ id from here.
+// Built-in business calendar. Times are India local (UTC+5:30); a booking exists only with a bk_ id from here.
 const IST = 330; // minutes
 const SLOT_MIN = 30;
-// Default clinic hours from the deck: Mon–Sat 10–2 and 5–8:30.
-const SESSIONS: [number, number][] = [[10 * 60, 14 * 60], [17 * 60, 20 * 60 + 30]];
+// Default opening hours: Mon–Sat 10 am to 8 pm, 30-minute slots.
+const SESSIONS: [number, number][] = [[10 * 60, 20 * 60]];
 
 export function parseLocal(s: string): Date | null {
   const m = s.trim().match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2}))?/);
@@ -26,7 +26,7 @@ export async function freeSlots(clinicId: ObjectId, dateStr: string): Promise<{ 
   const day = parseLocal(dateStr.slice(0, 10));
   if (!day) return { error: "Send the date as YYYY-MM-DD." };
   const localDay = new Date(day.getTime() + IST * 60_000);
-  if (localDay.getUTCDay() === 0) return { date: dateStr.slice(0, 10), free: [], note: "The clinic is closed on Sunday." };
+  if (localDay.getUTCDay() === 0) return { date: dateStr.slice(0, 10), free: [], note: "Closed on Sunday." };
   const { bookings } = await cols();
   const taken = new Set(
     (await bookings.find({ clinicId, status: "confirmed", start: { $gte: day, $lt: new Date(day.getTime() + 86_400_000) } }).toArray()).map((b) => b.start.getTime()),

@@ -27,11 +27,11 @@ export type JobCard = z.infer<typeof JobCard>;
 
 // The eight things a manager asks a new receptionist; the interview fills these one by one.
 export const INTERVIEW_FIELDS = [
-  { key: "business", label: "Business", q: "What is your clinic called, where is it, and when are you open?" },
-  { key: "mainJobs", label: "Main jobs", q: "What do patients usually call about?" },
+  { key: "business", label: "Business", q: "What is your business called, where is it, and when are you open?" },
+  { key: "mainJobs", label: "Main jobs", q: "What do customers usually call about?" },
   { key: "approvedPrices", label: "Approved prices", q: "Do you have a price list? I will only quote prices that are on it." },
   { key: "booking", label: "Booking", q: "How long is an appointment, and how should I book it?" },
-  { key: "languages", label: "Languages", q: "Which languages do your patients speak?" },
+  { key: "languages", label: "Languages", q: "Which languages do your customers speak?" },
   { key: "handoff", label: "Pass to a person", q: "When should a call come to you instead of me?" },
   { key: "never", label: "Never", q: "Is there anything I must never do?" },
   { key: "ifUnsure", label: "If unsure", q: "If someone asks something you haven't told me, what should I do?" },
@@ -46,7 +46,7 @@ export function filledCount(card: Partial<JobCard>) {
   }).length;
 }
 
-export function emptyCard(clinicName = "My clinic"): JobCard {
+export function emptyCard(clinicName = "My business"): JobCard {
   return JobCard.parse({ clinicName });
 }
 

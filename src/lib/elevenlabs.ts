@@ -39,10 +39,10 @@ export async function createClinicTools(clinicId: string) {
       { date: str("Date in YYYY-MM-DD format, India time") }, ["date"]),
     mk("book_slot", "Book an appointment. Only confirm a booking to the caller if this returns ok=true with a booking_id.", "book-slot",
       { start: str("Start time, ISO 8601 local India time, e.g. 2026-11-05T17:30"), patient_name: str("Caller's name"),
-        phone: str("Caller's phone number"), reason: str("Reason for the visit") }, ["start", "patient_name", "phone"]),
-    mk("log_callback", "Ask the clinic to call the caller back. Use when the caller needs a person or something can't be done now.", "log-callback",
+        phone: str("Caller's phone number"), reason: str("What the visit is for") }, ["start", "patient_name", "phone"]),
+    mk("log_callback", "Ask the business to call the caller back. Use when the caller needs a person or something can't be done now.", "log-callback",
       { name: str("Caller's name"), phone: str("Caller's phone number"), reason: str("Why they need a callback"),
-        urgent: { type: "boolean", description: "true if the caller is in pain, bleeding, swelling or very upset" } },
+        urgent: { type: "boolean", description: "true if it is an emergency, the caller is in pain, or very upset" } },
       ["name", "phone", "reason", "urgent"]),
   ]);
   return { checkSlots: checkSlots.id, bookSlot: bookSlot.id, logCallback: logCallback.id };
@@ -181,11 +181,11 @@ export async function getConversation(id: string) {
 // ---------- The interviewer: an ElevenLabs agent whose client tools write the job card ----------
 export async function interviewerAgentId() {
   const { settings } = await cols();
-  const s = await settings.findOne({ _id: "interviewer_v3" });
+  const s = await settings.findOne({ _id: "interviewer_v4" });
   if (s?.value) return s.value as string;
 
   const questions = INTERVIEW_FIELDS.map((f, i) => `${i + 1}. (${f.key}) ${f.q}`).join("\n");
-  const prompt = `You are Munshi, a friendly assistant who helps a small clinic owner set up an AI receptionist by interviewing them, the way a manager briefs a new hire.
+  const prompt = `You are Munshi, a friendly assistant who helps a small-business owner (a clinic, salon, shop, restaurant, coaching centre or any other business) set up an AI receptionist by interviewing them, the way a manager briefs a new hire.
 
 Ask these eight questions, one at a time, in order:
 ${questions}
@@ -202,7 +202,7 @@ When all eight are done, call finish_interview and say the job card is ready to 
     tags: ["munshi", "interviewer"],
     conversationConfig: {
       agent: {
-        firstMessage: "Hello Doctor. I'll ask you eight quick questions, like you'd brief a new receptionist. What is your clinic called, where is it, and when are you open?",
+        firstMessage: "Namaste! I'm Munshi. I'll ask you eight quick questions, just like you'd brief a new receptionist. First, what is your business called, where is it, and when are you open?",
         language: "hi",
         hinglishMode: true,
         prompt: {
@@ -231,6 +231,6 @@ When all eight are done, call finish_interview and say the job card is ready to 
       tts: { modelId: "eleven_flash_v2_5" },
     },
   });
-  await settings.updateOne({ _id: "interviewer_v3" }, { $set: { value: agentId } }, { upsert: true });
+  await settings.updateOne({ _id: "interviewer_v4" }, { $set: { value: agentId } }, { upsert: true });
   return agentId;
 }

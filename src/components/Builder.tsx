@@ -2,75 +2,72 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "@/lib/client";
+import { useLang, useT } from "@/lib/i18n";
+import { BIZ_KEY, STARTERS } from "@/components/landing/content";
+import * as I from "@/components/Icons";
 
 const LIMIT = 1200;
 
-// Use-case starters from the brief. The clinic receptionist is the showcase; the others prove the loop is general.
-const STARTERS: { label: string; text: string }[] = [
-  { label: "Appointments", text: "A friendly receptionist for Sharma Dental Clinic in Indirapuram, open Mon–Sat 10 am–2 pm and 5–8:30 pm. Speaks English and Hindi, books 30-minute appointments, answers price questions from our list (scaling ₹1,200, filling ₹1,500, root canal from ₹6,000, braces consultation ₹500), and passes calls to me if a patient is in pain or upset. Never gives medical advice." },
-  { label: "Lead generation", text: "A receptionist for Green Acres Realty in Noida that answers enquiries about 2 and 3 BHK flats, asks budget, preferred area and move-in date, and books a site visit. Speaks English and Hindi. Never promises a price discount." },
-  { label: "Support", text: "A support line for Chai Point Café, Koramangala. Answers questions about opening hours (8 am–11 pm daily), menu and table bookings, and takes a callback for complaints. English and Hindi." },
-  { label: "Negotiation", text: "An assistant for a used-car dealer that answers questions about listed cars, shares the listed price only, and books a test drive. It never agrees to a lower price; it takes the offer and says the manager will call back." },
-  { label: "Collections", text: "A polite payment-reminder assistant for Sunrise Coaching Centre that reminds parents of pending fees, explains how to pay, and logs a callback if they need more time. Never threatens or shares details with anyone but the parent." },
-];
-
+// The whole start: speak (easiest) or type. Nothing technical to choose.
 export default function Builder() {
+  const t = useT();
+  const { lang } = useLang();
   const router = useRouter();
+  const [mode, setMode] = useState<"speak" | "type">("speak");
   const [text, setText] = useState("");
-  const [busy, setBusy] = useState<"" | "describe" | "interview">("");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  async function start(mode: "describe" | "interview") {
-    setBusy(mode);
-    setError("");
+  async function go(kind: "speak" | "type") {
+    setBusy(true); setError("");
     try {
-      const r = await api<{ id: string }>("/api/clinics", { json: mode === "describe" ? { description: text } : {} });
-      router.push(`/c/${r.id}${mode === "interview" ? "?step=interview" : "?step=jobcard"}`);
+      const r = await api<{ id: string }>("/api/clinics", { json: kind === "type" ? { description: text } : {} });
+      router.push(`/c/${r.id}?step=${kind === "speak" ? "interview" : "jobcard"}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
-      setBusy("");
+      setBusy(false);
     }
   }
 
   return (
-    <div className="card p-5 sm:p-6 shadow-[0_24px_60px_-30px_rgba(27,36,48,.25)]">
-      <label htmlFor="describe" className="text-[15px] font-semibold">Describe the receptionist you want</label>
-      <p className="text-[14px] text-ink-2 mt-1">Plain words, Hindi or English. Munshi turns it into a job card you can check.</p>
-      <div className="relative mt-3">
-        <textarea
-          id="describe"
-          className="field min-h-[132px] resize-y pr-3 pb-7 leading-relaxed"
-          maxLength={LIMIT}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Create a friendly receptionist who speaks English and Hindi, books appointments, answers questions about teeth cleaning prices, and transfers to me if a patient has pain."
-        />
-        <span className="absolute right-3 bottom-2 text-[12px] text-ink-3 tabular-nums">{text.length}/{LIMIT}</span>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2" role="list" aria-label="Use-case starters">
-        {STARTERS.map((s) => (
-          <button key={s.label} role="listitem" type="button" className="chip border border-line bg-surface text-ink-2 hover:border-teal hover:text-teal" onClick={() => setText(s.text)}>
-            {s.label}
+    <div className="card p-5 sm:p-7 shadow-[0_24px_60px_-34px_rgba(27,36,48,.35)]">
+      <h3 className="text-[19px] font-semibold text-center">{t("builderTitle")}</h3>
+      <div className="mt-5 grid sm:grid-cols-2 gap-3" role="radiogroup">
+        {([["speak", I.Mic, "builderSpeak", "builderSpeakD"], ["type", I.Keyboard, "builderType", "builderTypeD"]] as const).map(([m, Ic, a, b]) => (
+          <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)}
+            className={`text-left rounded-[14px] border-2 p-4 flex gap-3 cursor-pointer transition-colors ${mode === m ? "border-teal bg-teal-soft/60" : "border-line hover:border-line-2"}`}>
+            <span className={`grid place-items-center w-11 h-11 shrink-0 rounded-full ${mode === m ? "bg-teal text-white" : "bg-sunk text-ink-2"}`}><Ic className="w-5 h-5" /></span>
+            <span><span className="block font-semibold text-[16px]">{t(a)}</span><span className="block text-[14px] text-ink-2 mt-0.5">{t(b)}</span></span>
           </button>
         ))}
       </div>
-      {error && <p className="mt-3 text-[14px] text-fail" role="alert">{error}</p>}
-      <div className="mt-5 flex flex-col sm:flex-row gap-3">
-        <button className="btn btn-primary btn-lg flex-1" disabled={text.trim().length < 20 || !!busy} onClick={() => start("describe")}>
-          {busy === "describe" ? "Writing the job card…" : "Create job card"}
-        </button>
-        <button className="btn btn-lg flex-1" disabled={!!busy} onClick={() => start("interview")}>
-          <MicIcon /> {busy === "interview" ? "Opening…" : "Explain it out loud instead"}
-        </button>
-      </div>
-    </div>
-  );
-}
 
-export function MicIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-    </svg>
+      {mode === "speak" ? (
+        <button className="btn btn-primary btn-lg w-full mt-5" disabled={busy} onClick={() => go("speak")}>
+          <I.Mic className="w-5 h-5" /> {busy ? t("builderOpening") : t("ivStart")}
+        </button>
+      ) : (
+        <div className="mt-5">
+          <label htmlFor="describe" className="sr-only">{t("builderType")}</label>
+          <div className="relative">
+            <textarea id="describe" className="field min-h-[140px] resize-y pb-7 leading-relaxed" maxLength={LIMIT} value={text}
+              onChange={(e) => setText(e.target.value)} placeholder={t("builderPlaceholder")} />
+            <span className="absolute right-3 bottom-2 text-[12px] text-ink-3 tabular-nums">{text.length}/{LIMIT}</span>
+          </div>
+          <p className="mt-3 text-[14px] text-ink-2">{t("builderPick")}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {STARTERS.map((s) => (
+              <button key={s.biz} type="button" onClick={() => setText(s[lang])}
+                className="chip h-9 px-3.5 border border-line bg-surface text-ink-2 hover:border-teal hover:text-teal cursor-pointer">{t(BIZ_KEY[s.biz])}</button>
+            ))}
+          </div>
+          <button className="btn btn-primary btn-lg w-full mt-5" disabled={text.trim().length < 20 || busy} onClick={() => go("type")}>
+            {busy ? t("builderCreating") : t("builderCreate")}
+          </button>
+        </div>
+      )}
+      {error && <p className="mt-3 text-[14px] text-fail text-center" role="alert">{error}</p>}
+      <p className="mt-3 text-[13.5px] text-ink-3 text-center">{t("heroNote")}</p>
+    </div>
   );
 }

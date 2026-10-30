@@ -1,16 +1,19 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Orb from "@/components/OrbLazy";
-import { MicIcon } from "@/components/Builder";
+import * as I from "@/components/Icons";
+import { LogoMark } from "@/components/Logo";
 import { VoiceProvider, useVoiceSession } from "@/components/voice";
 import { api } from "@/lib/client";
+import { LangToggle, useT } from "@/lib/i18n";
 
-// Public share link: what a patient sees. Only the live, tested version answers.
+// What a customer sees from the share link. Only the live, practised version answers.
 export default function Talk({ id }: { id: string }) {
   return <VoiceProvider><Inner id={id} /></VoiceProvider>;
 }
 
 function Inner({ id }: { id: string }) {
+  const t = useT();
   const s = useVoiceSession();
   const [name, setName] = useState("");
   const [err, setErr] = useState("");
@@ -28,23 +31,27 @@ function Inner({ id }: { id: string }) {
 
   return (
     <main className="min-h-dvh grid place-items-center px-4 py-10">
-      <div className="w-full max-w-[460px] card p-6 text-center">
-        <p className="eyebrow">{name || "Clinic receptionist"}</p>
-        <h1 className="text-[24px] font-semibold mt-1">Talk to our receptionist</h1>
-        <p className="text-[14px] text-ink-2">AI assistant · English or Hindi</p>
-        <div className="w-[220px] h-[220px] mx-auto mt-2"><Orb className="w-full h-full" getLevel={s.getLevel} /></div>
-        <p className="text-[14px] text-ink-2 min-h-[20px]">{live ? (s.isSpeaking ? "Speaking…" : "Listening…") : ""}</p>
-        {(err || s.error) && <p className="text-fail text-[14px] mt-2" role="alert">{err || s.error}</p>}
-        <div className="mt-4">
-          {live ? <button className="btn btn-lg w-full" onClick={() => s.endSession()}>End call</button>
-            : <button className="btn btn-primary btn-lg w-full" disabled={busy} onClick={start}><MicIcon /> {busy ? "Connecting…" : "Start a call"}</button>}
-        </div>
-        {s.lines.length > 0 && (
-          <div ref={box} className="mt-5 text-left max-h-[240px] overflow-y-auto space-y-2 border-t border-line pt-4">
-            {s.lines.filter((l) => l.role !== "tool").map((l, i) => <p key={i} className="text-[14px]"><b>{l.role === "agent" ? "Receptionist" : "You"}:</b> {l.text}</p>)}
+      <div className="w-full max-w-[460px]">
+        <div className="flex justify-end mb-3"><LangToggle /></div>
+        <div className="card p-7 text-center shadow-[0_30px_60px_-34px_rgba(27,36,48,.35)]">
+          {name && <p className="text-[13px] font-semibold text-saffron-ink uppercase tracking-wider">{name}</p>}
+          <h1 className="font-display text-[28px] mt-1 leading-tight">{t("tkTitle")}</h1>
+          <p className="text-[14.5px] text-ink-2 mt-1">{t("tkSub")}</p>
+          <div className="w-[220px] h-[220px] mx-auto mt-2"><Orb className="w-full h-full" getLevel={s.getLevel} /></div>
+          <p className="text-[14.5px] text-ink-2 min-h-[22px]">{live ? (s.isSpeaking ? t("lcSpeaking") : t("lcListening")) : ""}</p>
+          {(err || s.error) && <p className="text-fail text-[14px] mt-2" role="alert">{s.error ? t("micBlocked") : err}</p>}
+          <div className="mt-4">
+            {live ? <button className="btn btn-lg w-full" onClick={() => s.endSession()}>{t("tkEnd")}</button>
+              : <button className="btn btn-primary btn-lg w-full" disabled={busy} onClick={start}><I.Phone className="w-5 h-5" /> {busy ? t("tkConnecting") : t("tkStart")}</button>}
           </div>
-        )}
-        <p className="text-[12px] text-ink-3 mt-5">You’re speaking with an AI receptionist. Calls are recorded so the clinic can follow up. Powered by Munshi on ElevenLabs.</p>
+          {s.lines.some((l) => l.role !== "tool") && (
+            <div ref={box} className="mt-5 text-left max-h-[240px] overflow-y-auto space-y-2 border-t border-line pt-4">
+              {s.lines.filter((l) => l.role !== "tool").map((l, i) => <p key={i} className="text-[14.5px]"><b>{l.role === "agent" ? t("prReceptionist") : t("you")}:</b> {l.text}</p>)}
+            </div>
+          )}
+          <p className="text-[12.5px] text-ink-3 mt-5">{t("tkNote")}</p>
+        </div>
+        <p className="mt-4 flex items-center justify-center gap-2 text-[13px] text-ink-3"><LogoMark size={18} /> Munshi</p>
       </div>
     </main>
   );

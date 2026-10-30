@@ -18,7 +18,7 @@ export const POST = route(async (req) => {
   const ip = ipHash(req);
   if ((await clinics.countDocuments({ ipHash: ip, createdAt: { $gt: new Date(Date.now() - 3_600_000) } })) >= MAX_PER_HOUR)
     throw new HttpError(429, "Too many receptionists created from this connection. Try again in an hour.");
-  const card = text ? await describeToCard(text) : emptyCard(clinicName?.slice(0, 80) || "My clinic");
+  const card = text ? await describeToCard(text) : emptyCard(clinicName?.slice(0, 80) || "My business");
   const _id = new ObjectId();
   await clinics.insertOne({ _id, card, stage: text ? "jobcard" : "interview", ipHash: ip, createdAt: new Date(), updatedAt: new Date() });
   const res = NextResponse.json({ id: String(_id), stage: text ? "jobcard" : "interview" });

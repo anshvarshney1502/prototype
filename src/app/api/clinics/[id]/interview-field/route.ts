@@ -17,7 +17,7 @@ export const POST = route<{ id: string }>(async (req, { id }) => {
   const v = normalizeInterviewValue(field, raw);
   const next: Record<string, unknown> = { ...c.card, [field]: v, answered: Array.from(new Set([...(c.card.answered ?? []), field])) };
   if (field === "business" && raw.trim()) {
-    next.clinicName = c.card.clinicName === "My clinic" ? raw.split(/[,.]/)[0].trim().slice(0, 80) || c.card.clinicName : c.card.clinicName;
+    next.clinicName = ["My clinic", "My business"].includes(c.card.clinicName) ? raw.split(/[,.]/)[0].trim().slice(0, 80) || c.card.clinicName : c.card.clinicName;
     const hours = raw.match(/(mon|tue|wed|thu|fri|sat|sun|monday|daily|\d{1,2}\s*(am|pm)|\d{1,2}\s*(to|-|–)\s*\d)/i) ? raw : "";
     if (hours) next.hours = raw.slice(0, 200);
   }
