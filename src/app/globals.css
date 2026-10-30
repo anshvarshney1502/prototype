@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* Munshi design system (from the deck): one accent, status colours only on test results. Light only, by design. */
+@theme {
+  --color-bg: #F5F7F8;
+  --color-surface: #FFFFFF;
+  --color-sunk: #EEF1F3;
+  --color-line: #DFE4E8;
+  --color-line-2: #CBD3DA;
+  --color-ink: #1B2430;
+  --color-ink-2: #4F5B69;
+  --color-ink-3: #7D8895;
+  --color-teal: #0D7377;
+  --color-teal-2: #0A5E61;
+  --color-teal-soft: #E3F2F2;
+  --color-pass: #26734A;
+  --color-pass-soft: #E4F2EA;
+  --color-fail: #B8382B;
+  --color-fail-soft: #FBEAE7;
+  --color-wait: #9A6A12;
+  --color-wait-soft: #FBF1DE;
+  --font-sans: var(--font-instrument), "Segoe UI", system-ui, sans-serif;
+  --font-hi: var(--font-devanagari), "Nirmala UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius-card: 16px;
+}
+
+html { color-scheme: light; }
+body { background: var(--color-bg); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { text-wrap: balance; letter-spacing: -0.015em; }
+:focus-visible { outline: 2px solid var(--color-teal); outline-offset: 2px; border-radius: 6px; }
+::selection { background: var(--color-teal-soft); }
+
+@layer components {
+  .card { @apply bg-surface border border-line rounded-[var(--radius-card)]; }
+  .btn { @apply inline-flex items-center justify-center gap-2 h-10 px-4 rounded-[10px] text-[14.5px] font-medium border border-line bg-surface text-ink transition-colors hover:border-line-2 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap; }
+  .btn-primary { @apply bg-teal border-teal text-white hover:bg-teal-2 hover:border-teal-2; }
+  .btn-ghost { @apply border-transparent bg-transparent hover:bg-sunk; }
+  .btn-lg { @apply h-12 px-5 text-[15.5px] rounded-[12px]; }
+  .field { @apply w-full rounded-[10px] border border-line bg-surface px-3 py-2 text-[15px] text-ink placeholder:text-ink-3 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal-soft; }
+  .eyebrow { @apply text-[12.5px] font-semibold uppercase tracking-[0.12em] text-teal; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-medium; }
+  .badge-pass { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-medium bg-pass-soft text-pass; }
+  .badge-fail { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-medium bg-fail-soft text-fail; }
+  .badge-wait { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-medium bg-wait-soft text-wait; }
+  .badge-muted { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-medium bg-sunk text-ink-2; }
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise .35s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes pulse-dot { 0%, 100% { opacity: .35 } 50% { opacity: 1 } }
+.dot-pulse { animation: pulse-dot 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .rise, .dot-pulse { animation: none; } }
