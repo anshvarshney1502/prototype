@@ -1,0 +1,257 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Munshi Pitch Deck</title>
+<style>
+@page{size:1600px 900px;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,"Helvetica Neue",Arial,sans-serif;color:#13202b;background:#fff}
+.s{width:1600px;height:900px;padding:70px 90px;position:relative;overflow:hidden;page-break-after:always;background:#f5f7f8}
+.s.dark{background:#0d3b3d;color:#fff}
+.tag{font-size:18px;letter-spacing:3px;text-transform:uppercase;color:#0f7a78;font-weight:700;margin-bottom:18px}
+.dark .tag{color:#7fd6cf}
+h1{font-size:64px;line-height:1.08;font-weight:800;letter-spacing:-1px}
+h2{font-size:46px;line-height:1.12;font-weight:800;letter-spacing:-.5px;margin-bottom:22px}
+p.lead{font-size:26px;line-height:1.45;color:#3b4a55;max-width:1200px}
+.dark p.lead{color:#cfe7e4}
+.num{position:absolute;bottom:34px;right:90px;font-size:16px;color:#8a9aa4}
+.brand{position:absolute;bottom:34px;left:90px;font-size:16px;color:#8a9aa4;font-weight:700}
+.row{display:flex;gap:44px;align-items:flex-start}
+.shot{border-radius:14px;box-shadow:0 18px 50px rgba(10,40,50,.18);border:1px solid #dfe5e8;width:100%;display:block}
+.col{flex:1}
+ul.b{list-style:none;margin-top:10px}
+ul.b li{font-size:23px;line-height:1.4;margin:0 0 16px;padding-left:30px;position:relative;color:#26343e}
+ul.b li:before{content:"";position:absolute;left:0;top:11px;width:12px;height:12px;border-radius:3px;background:#0f7a78}
+.dark ul.b li{color:#e3f2f0}.dark ul.b li:before{background:#7fd6cf}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:30px}
+.card{background:#fff;border:1px solid #dfe5e8;border-radius:16px;padding:28px}
+.card b{display:block;font-size:25px;margin-bottom:10px}
+.card span{font-size:20px;line-height:1.45;color:#46555f}
+.flow{display:flex;gap:14px;margin-top:40px;align-items:center}
+.flow div{flex:1;background:#fff;color:#13202b;border-radius:14px;padding:22px 16px;text-align:center;font-weight:700;font-size:24px}
+.flow div small{display:block;font-weight:400;font-size:16px;color:#5a6a74;margin-top:6px}
+.flow i{font-style:normal;color:#7fd6cf;font-size:30px}
+.quote{font-size:30px;line-height:1.4;border-left:6px solid #0f7a78;padding:6px 0 6px 26px;margin:26px 0;color:#13202b;font-style:italic}
+table{border-collapse:collapse;width:100%;font-size:20px}
+td,th{padding:13px 14px;border-bottom:1px solid #dfe5e8;text-align:left;vertical-align:top}
+th{color:#0f7a78;font-size:16px;letter-spacing:1px;text-transform:uppercase}
+.pill{display:inline-block;padding:6px 14px;border-radius:30px;font-size:18px;font-weight:700}
+.red{background:#fbe4e2;color:#b3261e}.green{background:#e2f2e7;color:#1f7a3d}
+.dk{background:#134c4e!important;border-color:#1d6264!important}.dk b{color:#fff}.dk span{color:#cfe7e4!important}
+</style></head><body>
+
+<section class="s dark">
+ <div style="margin-top:120px">
+ <div class="tag">Build Arena Hackathon · Problem Statement 2 · ElevenLabs</div>
+ <h1 style="font-size:120px">Munshi</h1>
+ <p class="lead" style="font-size:40px;margin-top:24px;color:#fff;max-width:1100px">Hire a voice receptionist by explaining the job.<br>Not by writing prompts.</p>
+ <p class="lead" style="margin-top:50px">The no-code builder that <b style="color:#7fd6cf">tests a voice agent before it ever talks to a customer.</b></p>
+ </div>
+ <div class="brand" style="color:#7fd6cf">Team DOT DOT COM · Ansh Varshney</div><div class="num">munshi-hackathon-prototype.vercel.app</div>
+</section>
+
+<section class="s">
+ <div class="tag">The problem</div>
+ <h2>Small businesses miss calls. Voice AI could answer them,<br>but nobody trusts it with real customers.</h2>
+ <div class="cards">
+  <div class="card"><b>Building is too technical</b><span>Today's voice agent tools expect system prompts, tool schemas and webhooks. A clinic owner thinks in rules, not prompts.</span></div>
+  <div class="card"><b>One good demo is not proof</b><span>LLM agents are probabilistic. An agent that answers correctly once may invent a price on the next call.</span></div>
+  <div class="card"><b>Mistakes are expensive</b><span>A wrong price, a fake booking, or medical advice given to a patient damages trust instantly.</span></div>
+ </div>
+ <div class="quote" style="margin-top:46px">“I don't want an AI that is clever. I want one that does exactly what my front desk does, and nothing more.”</div>
+ <div class="brand">Munshi</div><div class="num">02</div>
+</section>
+
+<section class="s">
+ <div class="tag">Meet our user</div>
+ <div class="row">
+  <div class="col" style="flex:.9">
+   <h2>Dr. Sharma runs a dental clinic in Indirapuram.</h2>
+   <ul class="b">
+    <li>Open Mon to Sat, 10–2 and 5–8:30. The phone rings while she is with patients.</li>
+    <li>Callers ask for prices, book cleanings, and sometimes call in pain.</li>
+    <li>She speaks Hindi, English and Hinglish, and so do her patients.</li>
+    <li>She has never written a prompt in her life.</li>
+   </ul>
+   <p class="lead" style="margin-top:20px"><b>Our goal:</b> she goes from zero to a tested, live AI receptionist in minutes, using only her voice.</p>
+  </div>
+  <div class="col"><img class="shot" src="shots/01-describe.png"></div>
+ </div>
+ <div class="brand">Munshi</div><div class="num">03</div>
+</section>
+
+<section class="s dark">
+ <div class="tag">The solution</div>
+ <h2>Munshi treats an AI agent like a new hire.</h2>
+ <p class="lead">Brief it. Check its job card. Give it a trial day. Coach its mistakes. Only then let it answer the phone.</p>
+ <div class="flow">
+  <div>1 · Interview<small>Explain the job by voice</small></div><i>→</i>
+  <div>2 · Job card<small>Review every rule</small></div><i>→</i>
+  <div>3 · Trial Day<small>8 tests × 3 runs</small></div><i>→</i>
+  <div>4 · Coach<small>Fix with one sentence</small></div><i>→</i>
+  <div>5 · Go live<small>Only if all blockers pass</small></div>
+ </div>
+ <ul class="b" style="margin-top:60px">
+  <li>Maps one-to-one to the brief: <b>Write → Review → Test → Refine → Deploy → Observe.</b></li>
+  <li>Built on ElevenLabs Agents, Agent Testing, Versioning, Scribe and Flash TTS.</li>
+ </ul>
+ <div class="brand" style="color:#7fd6cf">Munshi</div><div class="num">04</div>
+</section>
+
+<section class="s">
+ <div class="tag">Step 1 · Interview</div>
+ <div class="row">
+  <div class="col" style="flex:.62">
+   <h2>She talks. The job card fills itself.</h2>
+   <ul class="b">
+    <li>Munshi asks the 8 questions a manager would ask a new receptionist.</li>
+    <li>Answers in Hindi, English or Hinglish, by voice or text.</li>
+    <li>ElevenLabs <b>client tools</b> write each answer into the job card live, while she is still speaking.</li>
+   </ul>
+   <div class="quote" style="font-size:24px">“Sharma Dental Clinic in Indirapuram. Monday to Saturday, 10 to 2, and again 5 to 8:30.”</div>
+  </div>
+  <div class="col"><img class="shot" src="shots/02-interview.png"></div>
+ </div>
+ <div class="brand">Munshi</div><div class="num">05</div>
+</section>
+
+<section class="s">
+ <div class="tag">Step 2 · Job card</div>
+ <div class="row">
+  <div class="col"><img class="shot" src="shots/03-jobcard.png"></div>
+  <div class="col" style="flex:.62">
+   <h2>Plain-language rules, not a hidden prompt.</h2>
+   <ul class="b">
+    <li>Business, prices, booking, languages, hand-off, “never”, “if unsure”.</li>
+    <li>Prices come from her own price list. Nothing is invented.</li>
+    <li>She picks a natural Indian English / Hindi voice from the ElevenLabs library.</li>
+    <li>Every call opens by saying it is an AI. <b>Nothing is created until she approves.</b></li>
+   </ul>
+  </div>
+ </div>
+ <div class="brand">Munshi</div><div class="num">06</div>
+</section>
+
+<section class="s">
+ <div class="tag">Step 3 · Trial Day</div>
+ <div class="row">
+  <div class="col" style="flex:.6">
+   <h2>8 tricky calls. Each one run 3 times.</h2>
+   <p class="lead" style="font-size:22px">Because one good answer is not proof. Tests run through ElevenLabs Agent Testing with <code>repeat_count: 3</code> on the exact version.</p>
+   <ul class="b" style="margin-top:18px">
+    <li>Patient in pain, slot already taken, calendar down, “ignore your rules”…</li>
+    <li><span class="pill red">Unknown price · 0/3</span><br>The agent quoted <b>₹3,000</b> for whitening. That price is not on her list.</li>
+    <li>Go live stays <b>locked.</b></li>
+   </ul>
+  </div>
+  <div class="col"><img class="shot" src="shots/05-trial-run.png"></div>
+ </div>
+ <div class="brand">Munshi</div><div class="num">07</div>
+</section>
+
+<section class="s">
+ <div class="tag">Step 4 · Coach</div>
+ <div class="row">
+  <div class="col"><img class="shot" src="shots/08-coach-saved.png"></div>
+  <div class="col" style="flex:.62">
+   <h2>Fix a mistake with one sentence.</h2>
+   <div class="quote" style="font-size:24px">“If a price isn't on my list, don't guess. Say you'll confirm and offer a callback.”</div>
+   <ul class="b">
+    <li>Typed or spoken (ElevenLabs Scribe v2). Gemini turns it into a job-card rule.</li>
+    <li>A new <b>version 2</b> is created on its own branch. Version 1 is never touched.</li>
+    <li>The failure becomes a <b>permanent test</b> for every future version.</li>
+   </ul>
+  </div>
+ </div>
+ <div class="brand">Munshi</div><div class="num">08</div>
+</section>
+
+<section class="s">
+ <div class="tag">Step 3, again · Proof</div>
+ <div class="row">
+  <div class="col" style="flex:.6">
+   <h2>Every test re-runs. 8 of 8, three times each.</h2>
+   <ul class="b">
+    <li><span class="pill green">Unknown price · 3/3</span></li>
+    <li>Now: <i>“I can't confirm the whitening price right now. I can ask the clinic to call you back.”</i></li>
+    <li>The booking test matched a real calendar record, <code>bk_8812</code>.</li>
+    <li>Tests ran on the <b>same version</b> that goes live.</li>
+   </ul>
+   <p class="lead" style="margin-top:14px;font-size:24px"><b>Ready to go live</b> unlocks only now.</p>
+  </div>
+  <div class="col"><img class="shot" src="shots/09b-gate.png"></div>
+ </div>
+ <div class="brand">Munshi</div><div class="num">09</div>
+</section>
+
+<section class="s">
+ <div class="tag">Step 5 · Go live and observe</div>
+ <div class="row">
+  <div class="col"><img class="shot" src="shots/10-live.png"></div>
+  <div class="col" style="flex:.6">
+   <h2>Live on her website in one line.</h2>
+   <ul class="b">
+    <li>Passing branch merges to main. Public talk link and <code>&lt;elevenlabs-convai&gt;</code> widget. Phone via Twilio / SIP.</li>
+    <li>Call log with transcript, summary, outcome and sentiment.</li>
+    <li>Every booking ID the agent mentions is <b>verified</b> against the calendar.</li>
+    <li>Calls that need a human are flagged in red.</li>
+   </ul>
+  </div>
+ </div>
+ <div class="brand">Munshi</div><div class="num">10</div>
+</section>
+
+<section class="s">
+ <div class="tag">Under the hood</div>
+ <h2>A real, working product with deep ElevenLabs integration.</h2>
+ <table>
+  <tr><th>Step</th><th>ElevenLabs capability</th><th>What it does</th></tr>
+  <tr><td><b>Interview</b></td><td>Agents + client tools, signed URLs</td><td>Voice interview fills the job card live; no API key in the browser</td></tr>
+  <tr><td><b>Create</b></td><td>Agents API + server webhook tools</td><td>Job card compiled into prompt, greeting and booking tools</td></tr>
+  <tr><td><b>Trial Day</b></td><td>Agent Testing: next-reply, tool-call, simulation</td><td>8 tests × 3 runs with mocked calendar and errors</td></tr>
+  <tr><td><b>Coach</b></td><td>Branches + immutable versions, Scribe v2</td><td>Spoken correction → new tested version, instant rollback</td></tr>
+  <tr><td><b>Go live</b></td><td>Branch merge, convai widget, Flash v2.5 TTS</td><td>Hindi + English voice, deployed only when every blocker is 3/3</td></tr>
+  <tr><td><b>Observe</b></td><td>Conversations API + HMAC post-call webhook</td><td>Call log, summaries, verified booking IDs</td></tr>
+ </table>
+ <p class="lead" style="font-size:20px;margin-top:22px">Stack: Next.js 15 · React 19 · Tailwind 4 · Three.js · MongoDB Atlas · Gemini · deployed on Vercel.</p>
+ <div class="brand">Munshi</div><div class="num">11</div>
+</section>
+
+<section class="s dark">
+ <div class="tag">Why you can trust it</div>
+ <h2>Guardrails enforced in code, not promised in a prompt.</h2>
+ <div class="cards">
+  <div class="card dk"><b>No untested version live</b><span>Go live checks the last run of that exact version. Every blocker must pass 3/3.</span></div>
+  <div class="card dk"><b>No fake bookings</b><span>A booking exists only if the tool returned a real ID. A unique index blocks double booking.</span></div>
+  <div class="card dk"><b>Instant rollback</b><span>Every version lives on its own branch. A bad correction can never reach patients.</span></div>
+  <div class="card dk"><b>Nothing exposed in the browser</b><span>Voice sessions start from short-lived signed URLs only.</span></div>
+  <div class="card dk"><b>Responsible AI</b><span>Always discloses it is an AI. Never gives medical advice. Refuses prompt injection.</span></div>
+  <div class="card dk"><b>Built for India</b><span>Hindi, English and Hinglish, end to end, by voice.</span></div>
+ </div>
+ <div class="brand" style="color:#7fd6cf">Munshi</div><div class="num">12</div>
+</section>
+
+<section class="s">
+ <div class="tag">Beyond the clinic</div>
+ <h2>One loop. Any front desk.</h2>
+ <p class="lead">Five built-in starters already cover the most common voice jobs:</p>
+ <div class="cards" style="grid-template-columns:repeat(5,1fr)">
+  <div class="card"><b>Appointments</b><span>Clinics, salons, repair shops</span></div>
+  <div class="card"><b>Lead generation</b><span>Real estate, coaching</span></div>
+  <div class="card"><b>Support</b><span>FAQs, order status</span></div>
+  <div class="card"><b>Negotiation</b><span>Within set limits</span></div>
+  <div class="card"><b>Collections</b><span>Polite reminders</span></div>
+ </div>
+ <ul class="b" style="margin-top:40px">
+  <li><b>Next:</b> phone numbers out of the box, more Indian languages, WhatsApp hand-off, shared test packs per industry.</li>
+  <li><b>Business model:</b> monthly subscription per receptionist, priced well below a part-time front-desk hire.</li>
+ </ul>
+ <div class="brand">Munshi</div><div class="num">13</div>
+</section>
+
+<section class="s dark">
+ <div style="margin-top:140px">
+ <div class="tag">Munshi</div>
+ <h1 style="font-size:76px;max-width:1300px">Don't trust an AI agent because it sounds good.<br><span style="color:#7fd6cf">Trust it because it passed its trial day.</span></h1>
+ <p class="lead" style="margin-top:50px;font-size:30px">Try it: munshi-hackathon-prototype.vercel.app</p>
+ <p class="lead" style="font-size:24px;margin-top:10px">Team DOT DOT COM · Ansh Varshney · Thank you</p>
+ </div>
+</section>
+</body></html>
