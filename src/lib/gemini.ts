@@ -7,11 +7,24 @@ const g = globalThis as unknown as { _ai?: GoogleGenAI };
 const ai = () => (g._ai ??= new GoogleGenAI({ apiKey: env.geminiKey }));
 
 async function json<T>(system: string, user: string, schema: object): Promise<T> {
-  const r = await ai().models.generateContent({
-    model: env.geminiModel,
-    contents: user,
-    config: { systemInstruction: system, responseMimeType: "application/json", responseSchema: schema, temperature: 0.2 },
-  });
+  // Gemini returns 503/429 under load: retry with backoff, then fall back to the "latest" flash alias.
+  const models = [env.geminiModel, env.geminiModel, "gemini-flash-latest", "gemini-flash-latest"];
+  let r: Awaited<ReturnType<ReturnType<typeof ai>["models"]["generateContent"]>> | undefined;
+  for (let i = 0; i < models.length; i++) {
+    try {
+      r = await ai().models.generateContent({
+        model: models[i],
+        contents: user,
+        config: { systemInstruction: system, responseMimeType: "application/json", responseSchema: schema, temperature: 0.2 },
+      });
+      break;
+    } catch (e) {
+      const msg = String((e as Error)?.message || e);
+      if (i === models.length - 1 || !/503|429|UNAVAILABLE|RESOURCE_EXHAUSTED|high demand|overloaded/i.test(msg)) throw e;
+      await new Promise((res) => setTimeout(res, 800 * (i + 1)));
+    }
+  }
+  if (!r) throw new Error("The language model is busy. Try again in a moment.");
   const text = r.text ?? "";
   try { return JSON.parse(text) as T; } catch { throw new Error("The language model returned an unreadable answer. Try again."); }
 }
