@@ -107,7 +107,7 @@ function Inner({ id, data, onCard, onDone }: { id: string; data: Workspace; onCa
         </div>
       </section>
       <aside className="lg:pt-[76px]">
-        <CardView card={card} highlight={lit} />
+        <CardView card={card} highlight={lit} interview />
         <div className="mt-4 flex justify-end">
           <button className="btn btn-primary" disabled={n < 3 || live} onClick={onDone}>Review job card</button>
         </div>

@@ -3,7 +3,7 @@ import "server-only";
 
 function need(name: string): string {
   const v = process.env[name];
-  if (!v) throw new Error(`Missing environment variable ${name}. Copy .env.example to .env.local and fill it in.`);
+  if (!v) throw new Error(`Missing environment variable ${name}. Copy env.example to .env.local and fill it in.`);
   return v;
 }
 

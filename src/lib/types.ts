@@ -11,6 +11,7 @@ export interface Clinic {
   mainBranchId?: string;
   toolIds?: { checkSlots: string; bookSlot: string; logCallback: string };
   liveVersionId?: ObjectId;
+  ipHash?: string;             // who created it, for the creation rate limit
   createdAt: Date;
   updatedAt: Date;
 }

@@ -115,6 +115,14 @@ export async function getInvocation(id: string) {
   return el().conversationalAi.tests.invocations.get(id);
 }
 
+// Best-effort removal of everything a failed approve created on ElevenLabs.
+export async function cleanup({ testIds, agentId, toolIds }: { testIds: string[]; agentId?: string; toolIds: string[] }) {
+  const c = el().conversationalAi;
+  for (const t of testIds) await c.tests.delete(t).catch(() => {});
+  if (agentId) await c.agents.delete(agentId).catch(() => {});
+  for (const t of toolIds) await c.tools.delete(t, { force: true }).catch(() => {});
+}
+
 // ---------- Live sessions ----------
 export async function signedUrl(agentId: string, branchId?: string) {
   const r = await el().conversationalAi.conversations.getSignedUrl({ agentId, branchId });

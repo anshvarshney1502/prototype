@@ -1,11 +1,13 @@
 import { route } from "@/lib/api";
 import { cols, oid } from "@/lib/db";
 import { syncCalls } from "@/lib/workflow";
+import { requireOwner } from "@/lib/owner";
 
 export const maxDuration = 120;
 
 // Call log. ?sync=1 pulls finished conversations from ElevenLabs (works even without a webhook configured).
 export const GET = route<{ id: string }>(async (req, { id }) => {
+  requireOwner(req, id);
   const _id = oid(id);
   if (new URL(req.url).searchParams.get("sync")) await syncCalls(_id);
   const { calls } = await cols();

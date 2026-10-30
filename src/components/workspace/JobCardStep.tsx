@@ -80,7 +80,7 @@ export default function JobCardStep({ id, data, reload, onCreated }: { id: strin
                     const on = card.languages.includes(l);
                     return (
                       <button key={l} type="button" aria-pressed={on} className={`chip border ${on ? "border-teal bg-teal-soft text-teal" : "border-line text-ink-2"}`}
-                        onClick={() => set("languages", on ? (card.languages.length > 1 ? card.languages.filter((x) => x !== l) : card.languages) : [...card.languages, l])}>
+                        onClick={() => setCard((c) => ({ ...c, languages: on ? (c.languages.length > 1 ? c.languages.filter((x) => x !== l) : c.languages) : [...c.languages, l], answered: Array.from(new Set([...c.answered, "languages"])) }))}>
                         {l === "en" ? "English" : "Hindi · हिंदी"}
                       </button>
                     );

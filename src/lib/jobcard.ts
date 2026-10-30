@@ -20,6 +20,7 @@ export const JobCard = z.object({
   voiceId: z.string().default(""),
   voiceName: z.string().default(""),
   voiceOwner: z.string().default(""),   // set while the voice is still a library voice, cleared once added to the workspace
+  answered: z.array(z.string()).max(20).default([]),   // fields the owner actually answered (languages always has a default)
   useCase: z.enum(["appointments", "lead_generation", "support", "negotiation", "collections"]).default("appointments"),
 });
 export type JobCard = z.infer<typeof JobCard>;
@@ -39,6 +40,7 @@ export type FieldKey = (typeof INTERVIEW_FIELDS)[number]["key"];
 
 export function filledCount(card: Partial<JobCard>) {
   return INTERVIEW_FIELDS.filter(({ key }) => {
+    if (key === "languages") return !!card.answered?.includes("languages");
     const v = card[key as keyof JobCard];
     return Array.isArray(v) ? v.length > 0 : typeof v === "string" && v.trim().length > 0;
   }).length;
@@ -48,12 +50,19 @@ export function emptyCard(clinicName = "My clinic"): JobCard {
   return JobCard.parse({ clinicName });
 }
 
-// Parses "scaling ₹1,200, filling ₹1,500" style answers into price rows.
+// Parses "scaling ₹1,200, filling ₹1,500, root canal from ₹6,000" into price rows.
+// A comma followed by three digits is a thousands separator, not a list separator.
 export function parsePrices(text: string): z.infer<typeof Price>[] {
   return text
-    .split(/[,;\n]+/)
+    .split(/[;\n]+|,(?!\d{3}(?!\d))/)
     .map((s) => s.trim())
     .map((s) => s.match(/^(.*?)[\s:-]*((?:₹|rs\.?|inr)\s*[\d,]+(?:\s*(?:onwards|\+))?|[\d,]{3,}\s*(?:rupees|rs)?)$/i))
     .filter((m): m is RegExpMatchArray => !!m && m[1].trim().length > 0)
-    .map((m) => ({ item: m[1].replace(/\b(from|for|is|costs?)\b/gi, "").trim(), price: m[2].replace(/^(rs\.?|inr)\s*/i, "₹").trim() }));
+    .map((m) => {
+      const from = /\bfrom\s*$/i.test(m[1]);
+      const item = m[1].replace(/\b(from|for|is|costs?)\b/gi, "").replace(/\s+/g, " ").trim();
+      const amount = m[2].replace(/^(rs\.?|inr)\s*/i, "₹").trim();
+      return { item, price: from ? `from ${amount}` : amount };
+    })
+    .filter((p) => p.item.length > 0);
 }

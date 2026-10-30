@@ -41,17 +41,31 @@ export async function approve(clinicId: ObjectId, cardInput: unknown) {
     if (v[0]) Object.assign(card, { voiceId: v[0].id, voiceName: v[0].name, voiceOwner: v[0].owner });
   }
   Object.assign(card, await EL.ensureVoice(card));
-  const toolIds = await EL.createClinicTools(String(clinicId));
-  const { agentId, mainBranchId, versionId } = await EL.createReceptionist(card, Object.values(toolIds));
-  const { prompt, firstMessage } = compile(card);
-  const version: Version = {
-    _id: new ObjectId(), clinicId, number: 1, card, prompt, firstMessage, branchId: mainBranchId, elVersionId: versionId,
-    reason: "Created from the interview", status: "candidate", createdAt: new Date(),
-  };
-  await versions.insertOne(version);
-  await clinics.updateOne({ _id: clinicId }, { $set: { card, agentId, mainBranchId, toolIds, stage: "trial", updatedAt: new Date() } });
-  await saveTests(clinicId, defaultTests(card, toolIds, String(clinicId)));
-  return version;
+  const { tests } = await cols();
+  let toolIds: Clinic["toolIds"], agentId = "";
+  const versionDoc: Version[] = [];
+  try {
+    toolIds = await EL.createClinicTools(String(clinicId));
+    const a = await EL.createReceptionist(card, Object.values(toolIds));
+    agentId = a.agentId;
+    const { prompt, firstMessage } = compile(card);
+    const version: Version = {
+      _id: new ObjectId(), clinicId, number: 1, card, prompt, firstMessage, branchId: a.mainBranchId, elVersionId: a.versionId,
+      reason: "Created from the interview", status: "candidate", createdAt: new Date(),
+    };
+    await versions.insertOne(version);
+    versionDoc.push(version);
+    await saveTests(clinicId, defaultTests(card, toolIds, String(clinicId)));
+    // Only now does the clinic count as created, so a failed approve can simply be retried.
+    await clinics.updateOne({ _id: clinicId }, { $set: { card, agentId, mainBranchId: a.mainBranchId, toolIds, stage: "trial", updatedAt: new Date() } });
+    return version;
+  } catch (e) {
+    const owned = await tests.find({ clinicId }).toArray();
+    await EL.cleanup({ testIds: owned.map((t) => t.elTestId), agentId, toolIds: toolIds ? Object.values(toolIds) : [] });
+    await tests.deleteMany({ clinicId });
+    if (versionDoc[0]) await versions.deleteOne({ _id: versionDoc[0]._id });
+    throw e;
+  }
 }
 
 // Trial Day: every test, three runs each, on this exact version's branch.
@@ -77,6 +91,11 @@ export async function refreshRun(runId: ObjectId) {
   const run = await runs.findOne({ _id: runId });
   if (!run) throw new HttpError(404, "Run not found");
   if (run.status !== "running") return run;
+  if (Date.now() - run.createdAt.getTime() > 20 * 60_000) {
+    const error = "ElevenLabs didn't finish these tests within 20 minutes. Run Trial Day again.";
+    await runs.updateOne({ _id: runId }, { $set: { status: "error", error, updatedAt: new Date() } });
+    return { ...run, status: "error" as const, error };
+  }
   const inv = await EL.getInvocation(run.invocationId);
   const defs = new Map((await tests.find({ clinicId: run.clinicId }).toArray()).map((t) => [t.elTestId, t]));
   const results: RunResult[] = run.results.map((r) => {

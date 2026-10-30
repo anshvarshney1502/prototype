@@ -9,6 +9,10 @@ export async function api<T = unknown>(path: string, init?: RequestInit & { json
     headers: init?.json !== undefined ? { "content-type": "application/json", ...(init?.headers || {}) } : init?.headers,
     body: init?.json !== undefined ? JSON.stringify(init.json) : init?.body,
     cache: "no-store",
+    signal: init?.signal ?? AbortSignal.timeout(110_000),
+  }).catch((e: unknown) => {
+    if (e instanceof DOMException && (e.name === "TimeoutError" || e.name === "AbortError")) throw new Error("This is taking too long. Check your connection and try again.");
+    throw e;
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error((data as { error?: string }).error || `Request failed (${res.status})`);

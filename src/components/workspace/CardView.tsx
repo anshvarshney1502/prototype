@@ -9,7 +9,7 @@ export function fieldText(card: JobCard, key: string) {
 }
 
 // Read-only job card: the eight lines the receptionist follows.
-export default function CardView({ card, highlight, compact }: { card: JobCard; highlight?: string | null; compact?: boolean }) {
+export default function CardView({ card, highlight, compact, interview }: { card: JobCard; highlight?: string | null; compact?: boolean; interview?: boolean }) {
   const n = filledCount(card);
   return (
     <div className="card">
@@ -19,7 +19,8 @@ export default function CardView({ card, highlight, compact }: { card: JobCard; 
       </div>
       <dl className="divide-y divide-line">
         {INTERVIEW_FIELDS.map((f) => {
-          const t = fieldText(card, f.key);
+          // While interviewing, the language default must not look like an answer.
+          const t = interview && f.key === "languages" && !card.answered?.includes("languages") ? "" : fieldText(card, f.key);
           const lit = highlight === f.key;
           const gap = f.key === "ifUnsure" && !t && n >= 7;
           return (

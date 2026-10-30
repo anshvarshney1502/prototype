@@ -15,12 +15,12 @@ async function json<T>(system: string, user: string, schema: object): Promise<T>
       r = await ai().models.generateContent({
         model: models[i],
         contents: user,
-        config: { systemInstruction: system, responseMimeType: "application/json", responseSchema: schema, temperature: 0.2 },
+        config: { systemInstruction: system, responseMimeType: "application/json", responseSchema: schema, temperature: 0.2, httpOptions: { timeout: 25_000 } },
       });
       break;
     } catch (e) {
       const msg = String((e as Error)?.message || e);
-      if (i === models.length - 1 || !/503|429|UNAVAILABLE|RESOURCE_EXHAUSTED|high demand|overloaded/i.test(msg)) throw e;
+      if (i === models.length - 1 || !/503|429|UNAVAILABLE|RESOURCE_EXHAUSTED|high demand|overloaded|timeout|timed out|abort|fetch failed|ECONN|ETIMEDOUT/i.test(msg)) throw e;
       await new Promise((res) => setTimeout(res, 800 * (i + 1)));
     }
   }
@@ -55,6 +55,7 @@ languages: codes from ["en","hi"]. useCase: one of appointments, lead_generation
     ...out,
     clinicName: String(out.clinicName || "My clinic").slice(0, 80),
     languages: langs.length ? langs : ["en", "hi"],
+    answered: langs.length ? ["languages"] : [],
     useCase: ["appointments", "lead_generation", "support", "negotiation", "collections"].includes(String(out.useCase)) ? out.useCase : "appointments",
   });
 }

@@ -109,7 +109,7 @@ export default function TrialDay({ id, data, version, setVersionId, reload, auto
           <div className="h-full bg-teal transition-all duration-700" style={{ width: `${Math.max(6, (100 * run.results.reduce((s, r) => s + (3 - r.pending), 0)) / Math.max(1, run.total))}%` }} />
         </div>
       )}
-      {error && <p className="mt-3 text-fail text-[14px]" role="alert">{error}</p>}
+      {(error || run?.status === "error") && <p className="mt-3 text-fail text-[14px]" role="alert">{error || run?.error}</p>}
 
       {tab === "call" ? (
         <div className="mt-5"><LiveCall id={id} version={version} /></div>

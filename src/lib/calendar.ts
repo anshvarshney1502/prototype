@@ -13,7 +13,9 @@ export function parseLocal(s: string): Date | null {
   const m = s.trim().match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2}))?/);
   if (!m) return null;
   const [, y, mo, d, h = "0", mi = "0"] = m;
-  return new Date(Date.UTC(+y, +mo - 1, +d, +h, +mi) - IST * 60_000);
+  const t = new Date(Date.UTC(+y, +mo - 1, +d, +h, +mi));
+  if (t.getUTCFullYear() !== +y || t.getUTCMonth() !== +mo - 1 || t.getUTCDate() !== +d || +h > 23 || +mi > 59) return null;
+  return new Date(t.getTime() - IST * 60_000);
 }
 export function fmtLocal(d: Date) {
   const l = new Date(d.getTime() + IST * 60_000);

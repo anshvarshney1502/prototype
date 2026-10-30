@@ -68,7 +68,7 @@ Requirements: Node 20+, a MongoDB Atlas cluster, an ElevenLabs API key, a Gemini
 
 ```bash
 npm install
-cp env.example .env.local   # fill ELEVENLABS_API_KEY, GEMINI_API_KEY, MONGODB_URI, TOOL_SECRET, PUBLIC_BASE_URL
+cp .env.example .env.local   # fill ELEVENLABS_API_KEY, GEMINI_API_KEY, MONGODB_URI, TOOL_SECRET, PUBLIC_BASE_URL
 npm run dev
 ```
 
@@ -76,7 +76,7 @@ npm run dev
 
 ### Deploy on Render
 
-`render.yaml` defines the web service. Create it from the repo (Blueprint), add the environment variables from `env.example` in the Render dashboard, and set `PUBLIC_BASE_URL` to the Render URL.
+`render.yaml` defines the web service. Create it from the repo (Blueprint), add the environment variables from `.env.example` in the Render dashboard, and set `PUBLIC_BASE_URL` to the Render URL.
 
 ## Project layout
 

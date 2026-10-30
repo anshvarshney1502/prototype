@@ -2,10 +2,12 @@ import { route, body } from "@/lib/api";
 import { cols, oid, HttpError } from "@/lib/db";
 import { JobCard } from "@/lib/jobcard";
 import { getClinic } from "@/lib/workflow";
+import { requireOwner } from "@/lib/owner";
 
 // Everything the workspace needs in one read.
-export const GET = route<{ id: string }>(async (_req, { id }) => {
+export const GET = route<{ id: string }>(async (req, { id }) => {
   const _id = oid(id);
+  requireOwner(req, _id);
   const c = await getClinic(_id);
   const { versions, tests, runs, bookings, callbacks } = await cols();
   const [vs, ts, rs, bk, cb] = await Promise.all([
@@ -21,6 +23,7 @@ export const GET = route<{ id: string }>(async (_req, { id }) => {
 // Visual editor before the receptionist exists. After that, edits go through Refine so they become a tested version.
 export const PATCH = route<{ id: string }>(async (req, { id }) => {
   const _id = oid(id);
+  requireOwner(req, _id);
   const c = await getClinic(_id);
   if (c.agentId) throw new HttpError(409, "The receptionist already exists. Save edits as a new version instead.");
   const { card } = await body<{ card: unknown }>(req);
